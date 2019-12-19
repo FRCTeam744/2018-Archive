@@ -1,0 +1,18 @@
+// template for getInstance() stuff.
+
+
+	/*---------------------------------------------------------
+	 * getInstance stuff                                      
+	 *---------------------------------------------------------*/
+	/** 
+	 * handle making the singleton instance of this class and giving
+	 * others access to it
+	 */
+	private static final FixMe_ClassName m_instance = new FixMe_ClassName();
+	public static synchronized FixMe_ClassName getInstance() return m_instance; }
+	private FixMe_ClassName() { //change to 'protected' if needs to be subclassed
+		if(m_instance != null) {
+			System.out.println("Oops! creating an additional instance of " + this.getClass().getSimpleName() 
+				+ ": original: " + m_instance.toString() + " this one: " + this.toString());}
+	}
+	/*----------------end of getInstance stuff----------------*/

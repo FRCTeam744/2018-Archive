@@ -1,0 +1,1261 @@
+Change Log for project T744yr18_SoFla
+
+============= T744yr18_SoFla_2018-03-31_13-28_chkGameMsgOnlyFromInitializeMethods.zip
+
+	TmACGrpTrajLeftStartScaleTwoCubeCallbackI	new interface to allow use of callback for 
+													TmACGrpTrajLeftStartScaleTwoCube
+	TmACmdDriveStraight				if an TmACGrpTrajLeftStartScaleTwoCubeCallbackI object is passed in,
+										call its callback method to decide whether to run the command
+										or to skip it
+	TmACmdFollowTrajectoryLeftOrRight	if an TmACGrpTrajLeftStartScaleTwoCubeCallbackI object is passed in,
+											call its callback method to decide whether to run the command
+											or to skip it
+																			
+============= T744yr18_SoFla_2018-03-31_12-00_trajLOrR-BottomNoLongerStopsAuto.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	no longer stops autonomous if lift position is "BOTTOM"
+
+============= T744yr18_SoFla_2018-03-31_11-07_newCenterAuton.zip
+	TmSsAutonomous				new alg for center switch auto: ALG_TRAJ_CENTER_TO_SWITCH_RELEASE_AND_GET_CUBE
+									reduce delay after trajectory
+									traj trajRightSwitchToCenter.csv trajLeftSwitchToCenter.csv  and arm down
+									grabber down and unclamp
+									traj trajCenterToCube1.csv and run grabber in
+									clamp (grabber still running)
+									delay (make shorter)
+									grabber up an arm claw grabbing grabber 
+		
+============= T744yr18_SoFla_2018-03-31_10-17_OopsAutonAlgHadWrongOption.zip
+
+	TmSsAutonomous				use TrajLeftStartScaleTwoCubeOptionsERIGHT_SCALE_FIRST_CUBE_AND_BACK_ONLY instead of 
+									TrajLeftStartScaleTwoCubeOptionsEDRIVE_ONLY for ALG_TRAJ_LEFT_TO_EITHER_SCALE_NO_RELEASE
+
+============= T744yr18_SoFla_2018-03-31_09-34_allowLeftToRtScale2CubeTo1PlaceCube_UNTESTED.zip
+============= T744yr18_SoFla_TryIt_2018-03-31_09-34_allowLeftToRtScale2CubeTo1PlaceCube.zip
+
+	TmACGrpTrajLeftStartScaleTwoCube	use TrajLeftStartScaleTwoCubeOptionsE.DRIVE_ONLY instead of boolean 
+											to set "driveOnly" option
+										add option for right-side scale to just 
+											place cube 1
+											drive back 1 sec at 50%
+											stop
+	TmACmdFollowTrajectoryLeftOrRight	back out code that limits behavior for right-side scale
+											(added "false &&" to if statement)
+	
+	(update trajLeftToRightScale.csv from SoFlo_OPscale_2018-03-31_08-11.zip)
+
+============= T744yr18_SoFla_2018-03-30_17-56_justDrvForScaleRightFromTrajLOrR.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	for Scale Left let everything run 
+										for Scale Right just run first trajectory, don't move
+											arm/lift or grabber, don't move on to additional
+											cmds in cmd group
+
+============= T744yr18_SoFla_2018-03-30_16-12_stopAutoIfRightScaleInFollowTrajLOrR.zip
+
+	TmHdwrDsCntls	comment out unused btn def ARM_CLAW_RUN_WITH_JOYSTICK_BTN
+	(update trajectories trajLeftToLeftSwitch.csv and trajRightToRightSwitch.csv
+		from SoFlo_SideSwitch_2018-03-30_12-53.zip)
+	TmACmdFollowTrajectoryLeftOrRight	stop auto after trajectory if going to Right Scale
+											(add code to initialize())
+
+============= T744yr18_SoFla_2018-03-30_10-05_stopDriftAtEndOfAuton_onBot.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	when finished, call	TmSsDriveTrain.Driving.tankDriveRawPercentOutput(0.0, 0.0);
+	TmACmdFollowTrajectorySwitchOrScale	when finished, call	TmSsDriveTrain.Driving.tankDriveRawPercentOutput(0.0, 0.0);	
+		(stops "drift" after finishes)
+		
+============= T744yr18_SoFla_2018-03-30_04-40_updateAngleControllerInFollowLeftOrRightCommand.zip
+	Changes on top of T744yr18_SoFla_2018-03-30_00-30_limitDrvSpdWhenArmMvg_disableADXgyro_fixNullPtr_ranInSim
+	
+	TmACmdFollowTrajectoryLeftOrRight 	Added 3 potential ways to help the angle controller
+							1. Decouple from positional controller
+							2. Derivative Control
+							3. Integral Control
+						See email for detailed tuning guidance.
+
+============= T744yr18_SoFla_2018-03-30_00-30_limitDrvSpdWhenArmMvg_disableADXgyro_fixNullPtr_ranInSim.zip
+
+	TmSsDriveTrain		chg tankDriveJoysticksPercentOutput() to limit drive speed when 
+							arm/lift is being moved (limit drive to 50% if arm/lift > 15%)
+							goal is to prevent brownouts during teleop
+	TmSsArm				new ArmServices.getArmStage1MotorPercentOut() method to return current
+							lift motor percent output
+	TmGyroADXRS453SPI	disable ADX gyro when NavX gyro is enabled in Tm744Opts
+	TmACmdFollowTrajectorySwitchOrScale		fix another null pointer error (in setArmPosition())	
+	
+============= T744yr18_SoFla_2018-03-29_22-38_updChangeLogForEodSnapshot.zip
+============= T744yr18_SoFla._2018-03-29_18-39_hpPC_EOD-snapshot
+	
+	TmHdwrRoPhysBase	add entries to RoMtrContinuousAmpsE and RoMtrPeakAmpsE enums
+							for limiting to 25 Amps						
+	TmHdwrRoCntls		set arm/lift motors to clamp to 25A for both continuous and peak
+	Tm744Opts			USE_NO_GYROS = false; (i.e. enable use of gyros)
+	
+	(FYI, lowering the current limits had no noticeable effect on the brownouts.... Drivers
+		need to drive more gently when turning??)
+	(Based on log files, looks like ramp rate settings are ignored when TalonSRX is doing 
+		closed loop control)
+	(there was talk of new or updated trajectory files, but don't know if any were uploaded to 'bot)
+	(TmACGrpTrajLeftStartScaleTwoCube--driving only--took almost 19 seconds to run)
+	
+============= T744yr18_SoFla_2018-03-29_17-31_clampClawAndGrabberMotorsTo20AContinuous.zip
+
+	TmHdwrRoCntls	set arm/lift claw motors and grabber motors to clamp to 20A continuous
+						(peak remains at 32A)
+
+============= T744yr18_SoFla_2018-03-29_17-11_fixNullPtrInTrajSwitchOrScale.zip
+
+	TmACmdFollowTrajectorySwitchOrScale	fix null pointer exception: was checking for SWITCH while
+											m_liftPosition was null
+
+============= T744yr18_SoFla_2018-03-29_16-16_switchOrScaleReleasesAtSwitch_onBot.zip
+
+	TmACmdFollowTrajectorySwitchOrScale	now that we have working gyro, allow this to release
+											cube for Switch
+
+============= T744yr18_SoFla_2018-03-29_15-55_2cubeDriveOnly_noGyro-pitTest.zip
+
+	(opts to "no gyro" for pit testing of auton (not on 'bot yet))
+	TmACGrpTrajLeftStartScaleTwoCube	add constructor parm to disable everything except driving
+										use new getLiftPosToUse() and conditional operator to implement
+											the option to disable everything but driving
+										reduce the debug timeouts
+	TmSsAutonomous						add alg that does 2-cube auto with everything disabled except driving
+	
+============= T744yr18_SoFla_2018-03-29_13-44_shorterDelayForReleaseAtSwitch_allowAutonRerun_onBot.zip
+	(opts set to use gyro)
+	
+	TmACGrpAtSwitchReleaseCube				shorten delay between 'run lift' and 'release'
+	TmACmdFollowTrajectorySwitchOrScale		set tWorker to null in intialize to fix bug not being
+												able to re-run TmACGrpTrajCenterSwitchAndReleaseCube
+	TmACmdFollowTrajectoryLeftOrRight		set tWorker to null in intialize so can re-run without
+												having to restart the code or roboRIO
+												
+============= T744yr18_SoFla_2018-03-29_10-59_forPortToDrvSta.zip
+
+	opts to not use gyros - for use in pit
+	(trajectory files uploaded to robot, code deployed)
+	(new NavX installed, config'd)
+
+============= T744yr18_SoFla_2018-03-29_10-04_rdyToTest.zip
+============= T744yr18_SoFla_temp_exceptFix_2018-03-29_10-04_rdyToTest.zip
+
+	tweak previous files to align with Alex D. version (LiftPosE.USER instead of null, etc.)
+
+============= T744yr18_SoFla_temp_exceptFix_2018-03-29_04-10_tryToFixException_needToProofreadFollowTrajCmd.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	add LiftPosE parm to constructor. (code TOP for scale, SWITCH for
+											switch, BOTTOM for bottom, null to not move arm)
+										clean up comments, add better constructor description
+											
+	TmACGrpTrajCenterSwitchAndReleaseCube	add LiftPosE parm to calls to TmACmdFollowTrajectoryLeftOrRight
+											clean up imports
+	TmACGrpTrajLeftStartScaleTwoCube	add LiftPosE parm to calls to TmACmdFollowTrajectoryLeftOrRight
+										use TmCCmdDelay instead of TmCCmdDoNothingForXSeconds
+										create and use DELAY_FOR_TESTING instead of hardcoded constant
+	TmACGrpTrajRightStartScale1CubeAmmenable	add LiftPosE parm to calls to TmACmdFollowTrajectoryLeftOrRight
+												clean up imports and comments
+	TmACGrpTrajLeftSwitchAndRelease		add LiftPosE parm to call to TmACmdFollowTrajectoryLeftOrRight
+	TmACGrpTrajRightSwitchAndRelease	add LiftPosE parm to call to TmACmdFollowTrajectoryLeftOrRight
+										clean up comments
+	TmSsAutonomous						add LiftPosE parm to call to TmACmdFollowTrajectoryLeftOrRight
+										
+============= T744yr18_SoFla_2018-03-29_00-22_adjustAnglePGain_needFixException_onPracticeBot.zip
+
+	fix opts to use gyros and to use the NavX gyro
+	
+	TmACmdFollowTrajectoryLeftOrRight 	TBD: fix exception string ndx out of bounds
+	TmSsDriveTrain						adjust ANGLE_P_GAIN
+
+============= T744yr18_SoFla_2018-03-28_22-53_putNewTrajFilesInProperFolder_onPracticeBot.zip
+
+	(put new trajectory files and .zip files in main trajectories package)
+	
+
+============= T744yr18_SoFla_2018-03-28_18-37_chgsForSim_disableLiveWindow.zip
+============= JmlSimYr18_SoFla_2018-03-28_18-37_chgsForSim_disableLiveWindow.zip
+
+	T744Robot2018		don't try to clear sticky faults when in simulation mode
+						disable all LiveWindow telemetry (LiveWindow.disableAllTelemetry();)
+	TmSsCompressor		don't try to clear sticky faults when in simulation mode
+	
+	(update earlier change log info)
+	
+	(changes to simulation code:)
+	DriverStation_SimI	add parm to SimDrvStaState.configureSimulation() to set an AllianceStationID value
+						change AutoTimeStateMachine to test various auto routines
+	HAL.java			read alliance info from SimDrvStaState instead of calling native method
+	JmlFrcMain			set an AllianceStationID value when starting up
+
+============= T744yr18_SoFla_2018-03-28_17-06_onlyUpdatedChangeLog.zip
+
+	TmACGrpAtSwitchReleaseCube		TBD: lower delay from 2 to 0.4 (doesn't take 2 seconds to eject the cube...)
+
+============= T744yr18_SoFla_2018-03-28_16-09-EST_addCodeToLowerGrabberJustBeforeEndOfTraj_addTrajZipFiles.zip
+
+	TmACmdFollowTrajectoryLeftOrRight		add constructor that allows the grabber to be moved down prior to 
+												end of trajectory so don't have to drive with it down any longer
+												than necessary
+													
+	(add zip files with new untested trajectory files to t744utils.fileIo.trajectories.toBeTested)
+		
+============= T744yr18_SoFla_2018-03-28_15-10_updateChgLog_updateSDstringsForAutonChooser.zip
+	(all functional changes listed here were part of T744yr18_SoFla_2018-03-28_12-30_addScaleAutoModes.zip)
+
+    TmACGrpReleaseCube							created - operates arm/lift claw to release cube
+    TmACGrpTrajLeftStartScaleTwoCube			created - command group for scale autos starting on the left side
+    											(still need trajectory files)
+    TmACGrpTrajRightStartScale1CubeAmmenable	created - command group for trajectory when partnered with another
+    												2-cube scale auto capable robot
+    												- places one cube and then stays out of the way
+    											(still need trajectory files)
+    TmACmdDriveStraight						get timeout and drive speed from constructor args instead of using hardcoded values
+    TmACmdFollowTrajectoryLeftOrRight		add BOTTOM and NONE to possible trajectory destinations/lift heights
+    										add wantToStopAuto and wantToMoveArm parms
+    										change some of the settings used for various robot and arm positions
+    TmSsAutonomous			chg ALG_TRAJ_LEFT_TO_EITHER_SCALE_RELEASE
+								(was just following trajectories but not actually releasing)
+								now uses TmACGrpTrajLeftStartScaleTwoCube
+								update string for SD chooser
+       						chg ALG_TRAJ_RIGHT_TO_EITHER_SCALE_RELEASE
+								(was just following trajectories but not actually releasing)
+								now uses TmACGrpTrajRightStartScale1CubeAmmenable
+								update string for SD chooser
+							chg ALG_TEST_DRIVE_STRAIGHT_TEST to pass speed and timeout to cmd
+
+============= T744yr18_SoFla_2018-03-27_14-48_cleanup_prepToNotReleaseIfLeftRightToSwitch.zip
+
+	(FYI: Tm744Opts	set to enable NavX and use it for trajectories)
+
+	TmACmdFollowTrajectorySwitchOrScale	set armIsNotSet and clampIsNotSet in initialize()
+										use new parm wantToRelease to decide when to allow release of cube
+											instead of figuring it out on-the-fly
+										(FYI, don't release if going to Switch)
+										(FYI, don't use gyro if going to Switch)
+	TmACmdFollowTrajectoryLeftOrRight	add code to operate clamp too
+										remove unused constructor
+										use new parm wantToRelease to decide when to allow release of cube
+											instead of figuring it out on-the-fly
+										(FYI, still releases if going to Switch -- need to ask Drivers what they want)
+										(FYI, don't use gyro if going to Switch)
+	Tm744Opts							reenable NavX and use it for trajectories
+
+	(clean up change log (no major changes needed))
+
+============= T744yr18_SoFla_2018-03-26_EOD-snapshot_DellPC.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	set armIsNotSet to true in initialize()
+	(same fix needed in other code too....)
+
+============= T744yr18_SoFla_2018-03-26-21-41_TalonTimeoutsCanBeSetFromMethod_onPracticeBot.zip
+
+	TmFakeable_CanTalonSrx		add timeoutToUse() method configurable to use the timeout coded in the
+									original call or to force all timeouts to some fixed value.
+
+=============
+	(old history info)
+============= T744yr18_Smokies_2018-03-24_14-31_unclampBeforeLift_onRobot_probs-restoredSebHpCode.zip
+
+	TmACmdFollowTrajectorySwitchOrScale		unclamp before lift arm while drive
+											if going to switch, don't release
+
+	(added elim trajectories)
+
+============= T744yr18_Smokies_2018-03-24_13-47_allKnownChgsSoFar_onRobot_probs-restoredPrevCode.zip
+
+	TmSsCompressor	add code to clear sticky faults on PCM (per suggestion by CSM)
+	T744Robot2018	add code to clear sticky faults on PDP (per suggestion by CSM)
+	
+============= T744yr18_Smokies_2018-03-24_09-18_rdTrajFilesInConstructor_negateAnglesRdFromNavX.zip
+
+	TmACmdFollowTrajectorySwitchOrScale		set thetaError=0 if heading to Switch (skip use of gyro even if allowed)
+	TmNavX				negate all angles read via getAngle() for compatibility with existing gyro-based code
+	
+============= T744yr18_Smokies_2018-03-24_07-00_portScaleSwitchTrajChangesToRightLeftTraj.zip
+
+	TmACmdFollowTrajectoryLeftOrRight	add tWorkers for Left and Right csv's. Load their data in the constructor. Set tWorker to them in initialize.
+						add m_liftPosition and corresponding logic from TmACmdFollowTrajectorySwitchOrScale.
+						increase start of lift to 2 seconds before trajectory is finished
+						Added a check to not use the gyro for destinations of the Switch. 
+						(Do you also want this logic in TmACmdFollowTrajectorySwitchOrScale?)
+	TmACmdFollowTrajectorySwitchOrScale	increase start of lift to 2 seconds before trajectory is finished
+	
+	Note: just had a thought. Could it be that the lift won't run unless the grabber is open?
+
+============= T744yr18_Smokies_2018-03-24_03-40_avoidFakeTalons_dbgTrajSwOrScl.zip
+
+	TmFakeable_CanTalonSrx	disable code that checks ErrorCode and configs as FAKE for certain values
+								except when running on software test fixture
+							list control names of FAKE talons and display on SD if there are any.
+							add retries for commands that return an ErrorCode that isn't "OK" 
+								(look for "int retryCnt = 3;" to find them)
+	TmSdKeysI				add key for fake can talon robot controls list
+	TmSsArm					make info about armStage1 operating mode and requested servo position
+								available to other code
+	TmACmdFollowTrajectorySwitchOrScale		update console messages (and a few comments) for better debug
+	
+============= T744yr18_Smokies_2018-03-23_10-59_fixSetpointForScaleMid_onRobot.zip
+
+	TmSsArm						fix BUG! getFixedEncoderPosition() was using switch height for
+									LiftPosE.SCALE_MID
+
+============= T744yr18_Smokies_2018-03-23_10-43_disableSupportForNavX.zip
+
+	(Tm744Opts: )
+	(physically removed NavX gyro)
+	
+	Tm744Opts					set USE_NAVX_GYRO back to 'false'
+	TmNavX						disable NavX code completely when Tm744Opts.isGyroNavX() returns false 
+	
+	(theory: NavX code messing up other parts of code (timing? threads?))
+
+============= T744yr18_Smokies_2018-03-23_10-10_tuneTweakAuton(ADchgs)_updateArmLiftSetpointBtns_UNTESTED.zip
+
+	TmHdwrDsCntls				chg arm/lift preset buttons: was POV-NE=midScale, X=lowScale, A=switch,
+									now: POV-E=switch, X=midScale, A=botScale
+	TmSsArm						reinstate midScale command in configDsCntls() (others were already active)
+
+	(port Alex D. chgs)
+	TmACmdFollowTrajectorySwitchOrScale 		1. Changed movement of arm to occur in execute, with 1 second left in any trajectory
+												2. Change the angle to global angle... if we run several trajectories after each other, 
+												we'll want to use angles that aren't reset.
+												3. Create several tWorkers that load the csv data in the constructor. 
+												Set the real tWorker to the appropriate one in initialize when game data is ready
+	TmACGrpTrajCenterSwitchAndReleaseCube		use TmACGrpAtSwitchReleaseCube to release cube
+													use NavX globalAngle() instead of localAngle() for thetaErr calc
+	TmACGrpTrajMoveToSwitchOrScaleAndRelease	oops! figureOutDelay() won't have valid gameMessage info
+													since called from constructor
+												remove the delay that depends on figureOutDelay() - it's not needed
+													with the change to TmACmdFollowTrajectorySwitchOrScale
+	TmSsCompressor								pass correct method name strings to updateCompressorClosedloopControl()
+
+============= T744yr18_Smokies_2018-03-22_19-45_resetGyroInInit_postThetaDesired_equivToOnRobot.zip
+
+	(Tm744Opts: use gyros, use NavX)
+	
+	(we don't really need these at this time--we reset the gyro in the init routines of TmSsDriveTrain and various commands)
+	TmHdwrDsCntls		TBD?: add button to use to zero the yaw value (left-drive-joystick btn 9?)
+	TmSsDriveTrain		TBD?: pair the new "zero yaw" button with a command that does the work
+
+============= T744yr18_Smokies_2018-03-22_19-45_sameAsPrevZipButWithBothGyrosDisabled.zip
+
+	(Tm744Opts: "don't use gyros") -- so we can put safe code on robot for Match 3 tomorrow
+
+============= T744yr18_Smokies_2018-03-22_19-45_resetGyroInInit_postThetaDesired_onRobot.zip
+
+	TmSdKeysI			didn't need new key; delete it and use KEY_DRIVE_THETA_ERROR_DEGREES instead
+	TmACmdFollowTrajectory 					reset gyro in initialize and post KEY_DRIVE_THETA_DESIRED to SD
+	TmACmdFollowTrajectoryLeftOrRight		ditto
+	TmACmdFollowTrajectorySwitchOrScale 	ditto
+	TmACmdFollowTrajectory_play				ditto
+
+============= T744yr18_Smokies_2018-03-22_17-33_prepTestNavXGyroAuton_tweakDelays_onRobot.zip
+
+	(Tm744Opts: use gyro (NavX))
+	
+	TmSdKeysI			add new key KEY_DRIVE_GYRO_THETA_ERROR
+	TmACmdFollowTrajectory 					post thetaError to SD
+	TmACmdFollowTrajectoryLeftOrRight		ditto
+	TmACmdFollowTrajectorySwitchOrScale 	ditto
+	TmACmdFollowTrajectory_play				ditto
+											check "don't use gyro" option (isUseNoGyros() method)
+											
+	TmACGrpTrajMoveToSwitchOrScaleAndRelease	made different delay times for switch and scale path respectively
+
+============= T744yr18_Smokies_2018-03-22_15-56_chgLiftMtrAutonDelay_updSomeCsvFiles_onRobot.zip
+	TmACgrpMoveToSwitchOrScaleAndRelease	increased delay for lift motors to 1s
+	
+	(update CSV files TrajLeftToLeftScale and TrajRightToRightScale)
+
+============= T744yr18_Smokies_2018-03-22_14-01_addOptForNoGyro_(thetaErr=0)_bkToNavX_onRobot.zip (Dell PC)
+
+	(Tm744Opts: "use no gyro", default gyro=NavX
+
+	Tm744Opts					new opt for "don't use gyro", restore NavX as gyro when gyro used,
+									include new opt in string for opts with no preferences								
+	TmACmdFollowTrajectory 		thetaError = 0 when "don't use gyro" is true
+	TmACmdFollowTrajectoryLeftOrRight		ditto
+	TmACmdFollowTrajectorySwitchOrScale 	ditto
+
+============= T744yr18_Smokies_2018-03-22_12-40_backToOrig(No)Gyro_onRobot.zip (Dell PC)
+
+	Tm744Opts				back to orig gyro (which isn't recognized) since NavX was driving
+								with oscillations and never released -- not sure it helped....
+
+============= T744yr18_Smokies_2018-03-22_12-00_enabNavX_DellPC_onRobot.zip (Dell PC)
+
+	Tm744Opts				enable NavX gyro
+
+============= T744yr18_Smokies_2018-03-22_11-30_updateAutonToUseGyro_DellPC.zip (Dell PC)
+
+	Tm744Opts				TBD: enable NavX gyro
+	TmACmdFollowTrajectory 		calculate thetaError using angle from gyro and angle_p_gain
+	TmACmdFollowTrajectoryLeftOrRight		ditto
+	TmACmdFollowTrajectorySwitchOrScale 	ditto
+
+============= T744yr18_Smokies_2018-03-22_10-22_updateAutonAndCsvFiles_DellPC.zip (Dell PC)
+
+	TmSsAutonomous			added algs to go to either Scale and release
+	TmSsDriveTrain			change ANGLE_P_GAIN
+	TmACmdFollowTrajectory	added thetaError for either NavX or ADX gyro
+	
+	(updated CSV files)
+	(updated Talon FW to 3.8)
+
+============= T744yr18_Smokies_2018-03-22_02-56_suppNavX_suppAdjADXrate_asTestedInSim_DellPC.zip (Dell PC)
+
+	FYI: Tm744Opts	set for single-solenoid drive shift, USB0 camera, ADXRS453SPI gyro
+
+	TmACGrpAtSwitchReleaseCube	Add delays between the unclamping and the raising of the arm/lift
+								increase delay between the arm raising starting and releasing the cube
+	TmACGrpTrajCenterSwitchAndReleaseCube	use TmACGrpAtSwitchReleaseCube instead of the individual cmds
+ 	TmNavX						Add simple class to post to Smart Dashboard some important values that can be
+ 									accessed from the NavX.
+ 									TotalYaw is equivalent to the gyro's getAngle(), as I (Alex D.) am assuming
+ 									the getYaw will be bounded to a certain range, likely -180 to 180, but I
+ 									haven't checked that!
+ 	AutoSpeed					Reduced constant for spinning by half, since it was tuned for last year's low gear robot. 
+	Tm744Opts					add option and isGyroNavX() method for NavX vs ADXRS453SPI gyro
+								add new NavX option to string of opts that don't have preferences
+								set drive gear shift option back to single-solenoid for competition 'bot
+								re-enable camera on USB0
+	TmACmdDriveSpinGyro			add code to support NavX gyro
+	TmACmdDriveStraightWithGyroThenStop		add code to support NavX gyro
+											change MAX_MOTOR_SPEED from 0.8 to 0.6
+											need to wait and get encoder info (see drvEncMgmt) from TmSsDriveTrain in
+												initialize() since TmSsAutonomous calls the constructor
+												before TmSsDriveTrain has been instantiated											
+	TmACmdFollowTrajectory_play	add code to support NavX gyro
+								show thetaError and desiredTheta on SD (keys may be disabled in TmSdKeysI)
+								update angle displayed on SD so it's in sync with thetaError
+	TmSdKeysI					add keys for use with NavX gyro
+								Added keys for theta error and desired theta for trajectory following.
+								add key for "raw" rate from ADXRS453SPI gyro
+	TmSsCompressor				Update autononomous, disabled, and teleop init to start and stop control 
+									of the compressor (when possible) to avoid interference with gyro 
+									during autonomous
+	TmSsDriveTrain				add DrvNavX class for use with NavX gyro
+	 								Has methods for soft and hard resets, corresponding to reseting a local and global angle.
+ 									Also has getters for local and global angle. Where local is angle since the last soft reset,
+ 										and global is since the last hard reset.
+ 									Added DrvNaxX.doInstantiate(), DrvNaxX.doCommonInit(), DrvNaxX.doPeriodic() in appropriate places.
+	        					use new SD key for raw gyro rate
+								pair recalibrate gyro rate cmd with appropriate button
+	TmHdwrDsCntls				add DRIVE_RECALIBRATE_GYRO_RATE_BTN for use when recalibrating rate from ADXRS453SPI gyro
+	TmGyroADXRS453SPI			change constructor to add additional SD parm for raw gyro rate
+								add m_rateAdj to class, add rateRaw to TimestampedRate class.
+								add command to recalibrate gyro rate (paired with button in TmSsDriveTrain)
+	            				In the gym, we saw a drift of about 1 deg/sec when robot was idle and compressor was off.
+									Since the drift appeared constant, added ability to adjust the rate returned by the gyro
+									by a constant amount and added a command that will monitor the rate (while a button is
+									held) and, if reasonably constant, set the adjustment amount to the average rate seen
+									while the command was running.  The thought is that there may be something on the robot
+									itself (magnets for encoders?) that is causing the drift and this may allow us to 
+									compensate for it.
+
+============= T744yr18_Smokies_2018-03-19_23-15_fixArmBug_debugNewAlgs_needCsvFixes_DellPC.zip (Dell PC)
+
+	TmSsArm					runArmClawLiftWheelsTeleop() should check for active joystick
+								before checking for GRABBING or RELEASING states
+	TmSsAutonomous			more switch/scale and release algs
+							use correct filenames for Right Switch, Right Scale in some algs
+								
+	(new trajectory files in project and on 'bot (a couple have wrong data....)
+
+============= T744yr18_Smokies_2018-03-19_22-01_algsChooseSwitchScaleAndRelease_DellPC.zip (Dell PC)
+
+	TmSsAutonomous			add algs to pick switch or scale or drive straight trajectories
+								followed by releasing cube. (if drive straight, never 'finish'
+								the trajectory command so don't try to release a cube)
+	TmACGrpTrajMoveToSwitchOrScaleAndRelease	new cmd grp for new algs	
+
+============= T744yr18_Smokies_2018-03-17_22-25_addAlgForGyro_DellPC.zip (Dell PC)
+
+	TmSsAutonomous			add alg for drive straight with gyro
+
+============= T744yr18_Smokies_2018-03-17_21-20_armClawRelWhileHeldIsTopPrior_adjScaleLowPreset_DellPC.zip (Dell PC)
+
+	TmSsArm					for claw, make release-while-held the top priority action
+							raise SCALE_LOW by 6 inches (24 instead of 18)
+	TmHdwrDsCntls			re-enable 'stop arm claw (lift wheels)' function
+
+	(new SD layout file and Ro/Ds controls doc in misc folder)
+
+============= T744yr18_Smokies_2018-03-17_20-35_fixLiftSetPtBugs_fixArmClawBug_addAutonAlgs_DellPC.zip (Dell PC)
+
+	TmDriverStation			include gameMessage in driver station status on SD
+	TmSsAutonomous			add algs for choose scale/switch/straight
+	TmACmdFollowTrajectorySwitchOrScale		created for use with new algs
+	TmSsArm					restore function of ARM_LIFT_RESET_ENCODER_BTN
+							disable use of preferences for tuning setpoints for now--SD values are wrong
+							add snapshot to relative encoder value when setting setpoint to talon
+							for claw, check for RELEASING or GRABBING states before looking for 
+								release-while-held button or joystick control
+	TmCCmdArmRunLiftWithEncoderPositions		add SCALE_LOW to list of supported setpoints
+	
+	(new SD layout file in misc folder)
+
+============= JmlSimYr18_Smokies_2018-03-17_07-45_liftWheelsAutoRun_chgBtns.zip (jml PC)
+
+	TmCCGrpGrabberUpClampedWithWedge	move arm/lift to bottom, then start arm/lift wheels, then lift grabber
+	TmCCGrpGrabberUpClampedNoWedge		move arm/lift to bottom, then start arm/lift wheels, then lift grabber
+	TmCCGrpGrabberDownClampedNoWedge	arm/claw must release before lower grabber
+	TmCCmdDelay				ported from 2017 code as replacement for TmACmdDoNothingForXSeconds
+	TmHdwrDsCntls			reassign button functions per driver requests:
+								X is now low scale height instead of grab-while-held
+								A is now switch height
+
+============= JmlSimYr18_Smokies_2018-03-17_04-33_armLiftEncoderOverride_saneFakeEncoder.zip (jml PC)
+
+	TmSsArm					implement complete encoder/limit switch override buttons
+							when encoder override active, limit percentOut to 75% of max
+							configure the Talon's fake encoder to clamp values to a specific range
+							TBD: track max encoder rate
+	TmHdwrDsCntls			add buttons to turn "arm/lift limit switch override" on and off
+							remove/move/deprecate buttons that aren't wanted
+	TmToolsI				overload clampToRange() with a version for integer values
+	TmSdKeysI				new keys for tracking Arm/Lift encoder stats and reporting "encoder override" state
+							new key for tracking fake digital inputs
+	TmFakeable_CanTalonSrx	add ability to clamp fake encoder values to a specific range (new 
+								FakeParms.configFakeEncoder() method)
+							change ConnectedEncoder so that it always calls setFakeEncoder()
+							(now generates sane fake encoder values)
+	TmFakeable_DigitalInput	post list of FAKEs on SD
+	TmHdwrRoCntls			fix BUG: max encoder ticks per second was not being saved in the list entry for a control
+	TmTCmdArmSetEncoderOverride		created and paired with new button
+	TmTCmdArmClearEncoderOverride	created and paired with new button
+
+============= T744yr18_Smokies_2018-03-15_22-30_EOD-snapshot_prepWorkForNewButtons_DellPC.zip (Dell PC)
+
+	Tm744Opts		opts set for noSTF, has PCM0, has compressor, no cam0, dblSol
+	Tm744Opts		//opts set for STF, no PCM0, no compressor, no cam0
+	
+	TmSsArm					TBD: implement complete limit switch override
+	TmHdwrDsCntls			TBD: add buttons to turn "arm/lift limit switch override" on and off
+							TBD: remove buttons that aren't wanted
+
+============= T744yr18_Smokies_2018-03-15_22-12_pickAndChooseSglVsDblSolForGearShift.zip (Dell PC)
+
+	Tm744Opts		opts set for noSTF, has PCM0, has compressor, no cam0, dblSol
+	Tm744Opts		//opts set for STF, no PCM0, no compressor, no cam0
+	
+	TmACGrpAtSwitchReleaseCube				increase delay from 45ms to 50ms
+	TmACGrpTrajCenterSwitchAndReleaseCube	increase delay from 45ms to 50ms
+	Tm744Opts				add new option and use it to select single solenoid vs double
+								solenoid for drive shifter
+	TmSsDrvGearShiftDblSol	add back in to project
+	TmHdwrRoCntls	restore DRV_SHIFTER_HIGH_GEAR
+	TmCCmdDriveShiftGear	separate constructors for sgl sol vs dbl sol versions of
+								subsystem
+	T744Robot2018			use new option to select single-solenoid vs double-solenoid versions
+								of gear shifter
+	
+	TmSsArm					TBD: implement complete limit switch override
+	TmHdwrDsCntls			TBD: add buttons to turn "arm/lift limit switch override" on and off
+							TBD: remove buttons that aren't wanted
+
+============= T744yr18_Smokies_2018-03-15_18-37_fixUpStuffForSd.zip (hp PC)
+
+	Tm744Opts		set opts for STF, no PCM0, no compressor, no cam0
+	
+	TmSsArm			stick "FAKE" in front of ControlMode for lift motors as appropriate
+	TmSsDriveTrain	stick "FAKE" in front of ControlMode for drive motors as appropriate
+					update drive motor SD controlMode info from init methods too (new motorsPostToSd() method)
+					eliminate use of multiple SD keys for specific drive motor info
+	TmSdKeysI		remove redundant keys, disable more Stage2 keys
+
+============= JmlSimYr18_Smokies_2018-03-15_03-30_fixSimBug_updateForNewCtreLib.zip
+
+	rename package aSimulatorMain to aSimulatorCode in hopes of moving some things out of library packages (didn't work....)
+	TalonSRX.java				updated to match new CTRE library version
+	BaseMotorController.java	add imports for DemandType and FollowerType, other changes to match new CTRE library
+	simulation project version: DriverStation.java			fix BUG: use Tm744Opts.isInSimulationMode() to decide what to 
+									return from isDSAttached()
+									so that simulation code will process driver station controls properly again
+	DriverStation_SimI.java		comment out state TELEOP_DRV_VELOCITY_BTN_PRESS_AND_HOLD since the button has been removed
+	
+	TmFakeable_CanTalonSrx		do some clean up
+								comment out "case MotionMagicArc:" throughout the file for use with new CTRE libraries
+								use Tm744Opts.isInSimulationMode() to force FAKE mode to avoid annoying exceptions/errors
+	TmFakeable_RoDigitalInput	use Tm744Opts.isInSimulationMode() to force FAKE mode to avoid annoying exceptions/errors
+								
+============= T744yr18_Smokies_2018-03-13_23-20_EOD-snapshot-hpPC.zip
+
+	Tm744Opts			set opts for no PCM0, no compressor, no cam0
+
+	Tm744Opts			add options for "compressor installed" and "PCM0 installed"
+	TmHdwrRoCntls		use new options to set controls that use PCM0 to USE_FAKE mode when PCM not installed
+	TmACGrpAtSwitchReleaseCube				use enum values instead of hardcoded encoder values for lift presets
+	TmCCmdArmRunLiftWithEncoderPositions	use enum values instead of hardcoded encoder values for lift presets 
+	TmPrefKeys			add prefs for multiple arm/lift encoder readings
+	TmSsArm				define enum for use for selecting encoder values for lift presets
+						create string of default encoder preset values for display in preferences
+						use enum values instead of hardcoded encoder values for commands assigned to controls
+						use method to get encoder value for preset so can check preferences instead of always
+							using the hardcoded default value
+						TBD: use inches instead of encoder ticks for preference values
+	TmSsCompressor		don't try to do compressor stuff when compressor is not installed
+						
+	(refactor TmACGrpTraCenterjSwitchAndReleaseCube to TmACGrpTrajCenterSwitchAndReleaseCube)					
+
+============= T744yr18_Smokies_2018-03-13_22-00_fixMiscBugs_chgJoyStkMsgTime.zip
+
+	DriverStation	create and change JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL from 1.0 to 30.0 (line 68)
+	
+	TmHdwrDsCntls	change ARM_LIFT_RESET_ENCODER_BTN from L-drive to R-drive to avoid conflict
+	TmSsCompressor	check for null pointers for m_sensor and m_relay in sssDoRobotPeriodic()
+
+============= T744yr18_Smokies_2018-03-12_19-46_create_usePrefsToTuneArmEncoder_UNTESTED.zip
+
+	TmHdwrDsCntls		refactor ARM_LIFT_SET_ENCODER_TO_ZERO_BTN to ARM_LIFT_RESET_ENCODER_BTN
+						new ARM_LIFT_OVERRIDE_BOTTOM_LIMIT_WHILE_HELD_BTN causes encoder indication
+							that lift is at the bottom to be ignored as long as the button is held
+	TmTCmdArmResetLiftEncoder (refactored from TmCCmdArmSetLiftEncoderToZero)
+						calls ArmServices.requestResetLiftEncoder()
+	TmSsArm				pair cmd TmTCmdArmResetLiftEncoder with btn ARM_LIFT_RESET_ENCODER_BTN
+						refactor requestSetLiftEncoderToZero() to requestResetLiftEncoder()
+						getEncoderReading() saves the raw value read from Talon
+						postToSd() now posts the raw lift encoder reading and its snapshot value
+						add support to post and use preferences, especially to tune encoder values
+	TmSdKeysI			add key for posting arm lift encoder snapshot reading
+	TmPrefKeys			add key for displaying arm lift encoder defaults
+						add key for setting 'at top' encoder reading
+	Tm744Opts			add support for using preferences
+	TmToolsI			add support for preferences
+	T744Robot18			post boot opts to preferences
+	
+============= FINAL -- T744yr18_Orlando_2018-03-10_15-43_snapshot-EOD-not-on-robot.zip
+	TmHdwrDsCntls		button to reset lift encoder to zero
+	TmSsArm				TBD: pair cmd TmCCmdArmSetLiftEncoderToZero to btn ARM_LIFT_SET_ENCODER_TO_ZERO_BTN
+						create new ArmServices.requestSetLiftEncoderToZero() -- does nothing at present
+	TmCCmdArmSetLiftEncoderToZero	create file, calls ArmServices.requestSetLiftEncoderToZero()
+	
+============= FINAL on ROBOT -- T744yr18_Orlando_2018-03-10_11-19_disableActionsOnArmLimitSwitches.zip
+	
+	TmSsArm				merely monitor bottom limit switch, take no action 
+							based on it (currently uses if(false){} in checkMotionBottomLimitSwitch())
+						ignore top limit switch via if(false){} block
+	TmSdKeysI			re-enable boolean for arm bottom limit switch
+
+============= T744yr18_Orlando_2018-03-10_09-50_moveHiLoGearToTriggerBtns_onRobot.zip
+	TmHdwrDsCntls		comment out DRIVE_VELOCITY..., make hi/lo gear use Trigger buttons
+============= T744yr18_Orlando_2018-03-10_09-10_addCmdsForHiLoGear_onRobot.zip
+
+	TmSsArm				reverse true/false assignments for limit switch per wiring instructions
+							Louis gave to Jenae(sp??)
+						get ready to merely monitor bottom limit switch, take no action 
+							based on it (currently uses if(true){} in checkMotionBottomLimitSwitch())
+	TmSsDrvGearShift	add calls to whenPressed to assign cmds to Ds controls [on  'bot, works 8:56am]
+	
+============= T744yr18_Orlando_2018-03-09_22-03_snapshotOfGoodCode.zip
+	TmSsAutonomous	prepare for the addition of more algorithms
+	
+	//nothing needed????
+	n/a TmSsArm			re-eanble bottom limit switch?
+	n/a TmHdwrRoCntls	re-enable bottom limit switch?
+
+============= T744yr18_Orlando_2018-03-09_15-04_beginAiWork_autonRelAndStop.zip
+	TmACGrpAtSwitchReleaseCube	waits a couple seconds while releasing then stop motors
+	(refactor one auton cmd for consistency with related cmds) 
+	
+	TmHdwrDsCntls	TBD: add button to override arm lift limit switch monitoring
+
+	TmHdwrRoPhys	add named connections for analog input (UNTESTED)
+	TmHdwrRoCntls	add control for compressor sensor as analog
+	Tm744Opts		add option to enable use of analog compressor sensor
+	TmSsCompressor	start work to add ability to handle analog compressor sensor
+	
+============= T744yr18_Orlando_2018-03-09_13-21_powerCompressorOldWayForMatch.zip
+
+	TmSdKeysI		add keys for compressor sensor and relay state
+	TmSsCompressor	show sensor and relay states on SD
+	Tm744Opts		set flag back to use Compressor class method for match
+	
+============= T744yr18_Orlando_2018-03-09_10-53_powerCompressorFromRelay.zip
+	TmSsCompressor	don't display "compressor running" on SD when powering compressor from relay
+	TmSdKeysI		disable "compressor running" key when powering compressor from relay
+============= (oops! no backup, expect exceptions)
+
+	Tm744Opts		add option to indicate how to control the compressor
+						(for PCM vs Spike relay)
+	TmHdwrRoCntls	add control for relay for compressor
+	TmSsCompressor	power compressor from a Spike relay instead of the PCM
+	
+============= T744yr18_Orlando_2018-03-09_03-40_chgsPerThursPmMtg_UNTESTED.zip
+
+	TmSsGrabber		(clean up commented out code, etc.)
+					(fix some "should access static <thing> in a static way" warnings)
+	TmSsArm			TBD: whenever lift (tower/arm) is moving on purpose (not drifting down)
+						have arm claw motors ("lift wheels") grabbing at 20%
+					make highest preset the true max height value (make that a valid value)
+						(STAGE1_ENCODER_AT_TOP & STAGE1_ENCODER_MAX_HEIGHT_SETPOINT are now
+						both set to STAGE1_ENCODER_AT_MAX_HEIGHT)
+					STAGE1_ENCODER_AT_SCALE_MID now set to 29 inches (old "at top" value + 1 inch)
+					TBD: when selecting preset for "at bottom", also stop the arm claw ("lift wheels").	
+					the arm claw ("lift wheels") grabbing button (the X btn) and arm claw ("lift wheels")
+							grabbing button (the B btn) should now be on-while-held
+							replace ARM_CLAW_START_GRABBING_BTN, ARM_CLAW_START_RELEASING_BTN,
+								and ARM_CLAW_STOP_MOTORS_BTN with new ARM_CLAW_GRAB_WHILE_HELD_BTN
+								and ARM_CLAW_RELEASE_WHILE_HELD_BTN
+							create new method runArmClawLiftWheelsTeleop() and call it from runArm()
+								when in teleop mode
+					ARM_CLAW_RUN_WITH_JOYSTICK_INPUT is now the Y-axis instead of the X-axis
+					call ArmServices.requestClawMotorsOff() from disabled-, auton-, and teleop- init methods
+						(ensures motors always start off stopped)
+					No longer need button to put arm lift in IDLE mode or separate button to enable joystick
+						control of arm claw ("lift wheels")	
+					handleJoystickPercentOut() now sets a servo setpoint to hold the arm lift in position
+						when it detects a top or bottom limit switch condition. (Avoids issues with cube vs
+						no cube, drifting, and driver's battle with drift when at top.  May get squirrelly if
+						encoders aren't working right.)	
+					make runArmClawLiftWheelsTeleop() smarter: unless the driver is trying to control the 
+						lift wheels or is trying to servo to the bottom, check if the lift is being moved on 
+						purpose (motor percent out is not in deadband around 0.0) and if so, run the lift wheels
+						in GRABBING mode. 			
+	TmHdwrDsCntls	(delete old controls that were commented out, except those used to test/debug
+						the code that manages controls)
+					comment out some controls that are no longer needed with this set of changes
+	TmCCGrpArmRunLiftWheelsForGrabberUp		created to handle running arm claw ("lift wheels")
+												when bringing the grabber up.
+											Adjusted timing per drivers' request
+	TmCCGrpGrabberUpClampedWithWedge		use TmCCGrpArmRunLiftWheelsForGrabberUp
+											clamp before raise grabber
+	TmCCGrpGrabberUpClampedNoWedge			use TmCCGrpArmRunLiftWheelsForGrabberUp
+	TmCCGrpGrabberUpClampedDontCareWedge	use TmCCGrpArmRunLiftWheelsForGrabberUp
+											clamp before raise grabber
+	
+	
+	
+============= T744yr18_Orlando_2018-03-08_19-00_fixBUG-POV-N_chgArmClawSpeeds.zip
+	TmSsGrabber		BUG!! TmCCGrpGrabberUpClampedWithWedge was unclamping instead of clamping
+	TmSsArm			claw should release at 100%, grab at 20% (ClawStateE)
+	
+============= T744yr18_Orlando_2018-03-08_18-11_slowArmGrabRelease.zip
+	TmSsArm		change ClawStateE to reduce power for arm claw motors
+============= T744yr18_Orlando_2018-03-08_18-00_improveAuton.zip
+
+--changed auto addparallel intake grabber as the lift uses the preset so it stays in longer, shortened delay for grabber releasing to 0.030
+
+
+============= T744yr18_Orlando_2018-03-08_15-12_fixExcpMaxHeightNotAllowed.zip
+	TmSsArm		use AT_TOP instead of AT_MAX_HEIGHT setting for button Y
+				change AT_TOP to 34 inches per measurments given by Tommy et al
+============= oops! exception. no backup T744yr18_Orlando_2018-03-08_15-00_addAlgLeftSwitchRelease_Y-btnNowMaxHeight.zip
+	TmACGrpAtSwitchReleaseCube	created
+	TmSsAutonomous		add alg to just test the release sequence 
+						add alg for left to switch and release
+	TmSsArm				reduce max height setpoint slightly
+						remove POV-NE, use button Y for max height setpoint
+	TmACGrpTrajLeftSwitchAndRelease		created
+
+============= T744yr18_Orlando_tempJudiPlay_2018-03-08_13-57_switchAndReleaseAlgWithDelay.zip
+
+	TmACGrpTrajSwitchAndReleaseCube		add delay before tell tower/arm to release
+
+============= T744yr18_Orlando_tempJudiPlay_2018-03-08_13-41_addPovNEbtn_switchAndReleaseAlg.zip
+
+	TmSsArm			let it go higher before is stops the motors (1.5 inches up, 2.5 inches down)
+					implement "setpoint for max allowed height" button
+	TmSsAutonomous	add alg to go to switch and release
+	TmHdwrDsCntls	add "POV-NE button" for setpoint for max allowed height
+	TmHdwrDsPhysBase TBD: too many ripple effects right now: add XBOX_TM_CANNED_ANALOG_BUTTON type
+
+============= T744yr18_Orlando_tempJudiPlay_2018-03-08_10-39_idleArmMotorsIfTooCloseToEndTooFast.zip
+
+	TmSsArm			change runArm() JOYSTICK mode to use new methods to stop the motors if close to top or bottom
+						and still trying to move that direction at more than a certain minimal speed
+
+============= T744yr18_Orlando_tempJudiPlay_2018-03-08_10-01_addMethods_povW-setpointArmAtBottom.zip
+
+	TmSsArm			add new methods: isMotorPercentOutMovingDown(), isMotorPercentOutMovingUp(),
+						isEncoderNearBottom(), isEncoderNearTop()
+					eliminate teleopCmdsList command list -- it's more trouble than it's worth
+	TmHdwrDsCntls	use POV-W as setpoint for tower/arm at bottom (still have Left-J available to
+						use as analog buttons)
+
+============= T744yr18_Orlando_2018-03-07_04-20_removeUnneededCmdBtnsFromSd.zip
+
+	TmHdwrDsCntls	remove code that puts cmd button on smartdashboard (KEY_CMD_SHOW_DRVSTA_IO) to cut down clutter
+	TmHdwrRoCntls	add comments explaining why T744Robot2018 sets up the cmd for the joystick button (best guess) 
+					remove code that puts cmd button on smartdashboard (KEY_CMD_SHOW_ROBOT_IO) to cut down clutter
+	T744Robot2018	add comments explaining why T744Robot2018 sets up the cmd for the joystick button (best guess)
+
+============= T744yr18_OrlandoSTF_2018-03-07_00-30_fixLB&POV-Nbtns_armGrabsWhenSetGrbrUp.zip
+
+	Tm744Opts		set for STF and no camera....
+	(rename various unused commands/commandGroups by changing .java to .java_notUsed)
+	TmACmdDoNothingForXSeconds				created to help with timing in command groups
+	TmCCGrpGrabberUpClampedDontCareWedge	arm claw should grab for 500ms then stop
+	TmCCGrpGrabberUpClampedNoWedge			arm claw should grab for 500ms then stop
+	TmCCGrpGrabberUpClampedWithWedge		arm claw should grab for 500ms then stop
+	
+	TmSsGrabber		LB and POV-N should use cmd group, not command (GRABBER_FULL_UP_AND_CLAMPED_BTN,
+						GRABBER_PARTIAL_UP_AND_CLAMPED_BTN) so that can make sure arm claw
+						motors start grabbing at the same time.
+
+============= T744yr18_Orlando_2018-03-06_20-07_rmvSdCmdBtns_enaCam0.zip
+
+	TmSsArm			remove command buttons from SD
+	Tm744Opts		re-enable USB camera 0 option
+
+============= T744yr18_Orlando_2018-03-06_18-50_everythingSeemsSane!.zip
+
+	Tm744Opts		separate option for cascading arm with absolute encoder
+					set encoder back to relative mode
+	TmHdwrRoCntls	use 'new absolute' encoder option
+	TmHdwrDsPhys	encountered "dead controller" again.  Make disableAfterMsgs() do nothing
+						and use if(m_ds.isDSAttached()) {} to prevent attempts to access driver station
+						when it's not accessible
+					remove refs to unneeded controls (they were just for debug...)
+	TmHdwrDsCntls	removed unneeded controls
+					create new ARM_LIFT_SET_TO_IDLE_MODE_BTN control (POV-E)
+	TmCCmdArmLiftSetToIdleMode			switch from temporary ALT_... control to the standard one
+	TmTCmdArmRunClawWithXboxJoystick	switch from temporary ALT_ controls to standard ones
+	TmSsArm			change STAGE1_MOTOR_PERCENT_OUT_TO_MAINTAIN_POSITION to 0.060 per testing
+							(with no cube)
+					changes related to DsControls
+					use separate option for cascading arm with absolute encoder
+					let servo mode set allowed direction back to EITHER
+					reduce joystick speed to 25% when close to top or bottom
+						
+						
+	(DriverStation	TBD: create by making a  copy of the DriverStation class
+					TBD: change the message period for "not attached" (JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL)
+							to something bigger than 1 second
+						if(m_ds.isDSAttached()) {} block.  If ever see "dead xbox controller"
+						problem again, remove all such calls, make a copy of FRC's DriverStation
+						class and change the message period (JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL)
+						to something much larger than 1 second!)	
+
+============= T744yr18_Orlando_2018-03-06_01-59_prelimCfgForNewArm_needsTuningButSane.zip
+
+	TmSsArm			post string doc'ing what things in Arm code are fakes
+					if using fake encoder use 0.0 as percentout for "hold position" in
+						handleJoystickPercentOut()
+					new arm gives positive encoder readings when moving up, change
+						STAGE1_ENCODER_MULTIPLIER_FOR_MOVING_UP
+						based on Tm744Opts.OptDefaults.ARM_CASCADING
+					init mtrCfg.encoderType to CTRE absolute encoder (based on OptDefaults.ARM_CASCADING)
+	TmSdKeysI		add key for 'fake stuff' msg from arm subsystem
+	TmFakeable_CanTalonSrx		updateEncoderTicks() now uses m_namedCntlEnt.cMtrPosPercentOutVsThingDir
+									and m_namedCntlEnt.cMtrEncoderIncrVsThingDir to decide if need to 
+									multiply the change amount by -1 before adding to f_encoderPos
+									(coded inside an if(true){} block)
+	TmSsCompressor	don't try to access compressor state when running on Software Test Fixture
+						(implement a 'fake' state to report to SD and a method that simulation
+							code can call to set the 'fake' state)
+	TmHdwrRoCntls	swap the stage1 and stage2 motor can id's to match robot
+					new arm gives positive encoder readings when moving up (EncoderIncrVsThingDirE parm)
+					make encoder ABSOLUTE_USED_AS_ABSOLUTE
+	Tm744Opts		check: might be set for STF and no USB0 camera
+					check: RUN_STG1AUX_MTR_FROM_ARM_CLAW_RIGHT_TALON_ETC should now be false
+					check: ARM_ENC_FAKE should now be false
+							
+============= T744yr18_Orlando_2018-03-05_19-18_hpSnapshot_bogusCfg_fakeEnc.zip
+
+	TmFakeable_CanTalonSrx	make flag for 'fake encoder' public
+	TmSsGrabber     isGrabberUpFullLimitSwitchTripped() always reads hdwr state
+					grabber limit switch installed option set to false -- limit switch
+						affects nothing but SD
+					(grabber goes up/down, limit switch reading bounces around)
+					call postToSd() from STE_FINISH state machine state
+					display grabber up/down limit switch from robotPeriodic, not just from postToSd
+	TmSsCompressor	created
+	T744Robot2018	add compressor to Kss list
+	TmHdwrDsPhys	found some calls to disableAfterMsgs() that weren't inside an
+						if(m_ds.isDSAttached()) {} block.  If ever see "dead xbox controller"
+						problem again, remove all such calls, make a copy of FRC's DriverStation
+						class and change the message period (JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL)
+						to something much larger than 1 second!
+	Tm744Opts		add RUN_STG1AUX_MTR_FROM_ARM_CLAW_RIGHT_TALON_ETC option to temporarily run
+						cascading arm motors from what were arm claw motors, etc.
+	TmHdwrRoCntls	use new option RUN_STG1AUX_MTR_FROM_ARM_CLAW_RIGHT_TALON_ETC to temporarily
+						change can id assignments for arm claw and lift motors
+	TmSsArm			console messages re limit switches include info about fake/real limit switches
+						and encoders
+
+============= T744yr18_Orlando_2018-03-05_04-00_grabberUpLimitSwitch_UNTESTED.zip
+
+	TmSsGrabber		implement limit switch to verify grabber up full
+	TmHdwrRoCntls	assign a DIO pin for grabber limit switch
+	Tm744Opts		add option for "grabber up full" limit switch installed
+	TmSdKeysI		add SD key for "grabber up full" limit switch
+
+============= T744yr18_Orlando_2018-03-05_03-20_rdyToSmokeTestCascadingArm.zip
+
+	Tm744Opts		refactor Opts to OptDefaults in preparation for preferences support
+					add getters for the various options (for future preferences support)
+	TmPrefKeys		created in preparation for preferences support
+	TmExceptions	add InappropriatePreferenceRequestEx exception for future preferences support
+	TmSsArm			now have cascading stages instead of two separate stages. Motor with encoder
+						like it was for stage1, but now have a second motor that runs in the 
+						opposite direction simultaneously.  We'll swap the power connections between
+						the Talon and the motor so that the second motor can be a follower of
+						the first
+					ArmLiftMotorInfo's nudgeServoSetpoint() now checks the EncoderIncrVsThingDirE
+						parm in the named control and adjusts the sign of the nudge amount
+						accordingly.	
+	TmHdwrDsCntls	implement Back button on main controller to run arm from joystick (R-JOY_Y)
+					use R-JOY_Y to nudge arm in servo mode
+	TmHdwrRoCntls	add second motor for stage1/cascading stages
+					set stage1 enc to ENC_INCREASING_WHEN_THING_MOVING_DOWN
+
+============= T744yr18_Orlando_2018-03-04_23-55_autonTrajFollowingSane_simplerChooser.zip
+
+	(debugging autonomous, not sure what all changed during the day...)
+	TmACmdFollowTrajectoryLeftOrRight	takes two trajectory file names and picks the one to run
+	TmACmdFollowTrajectory_play			refactored from TmACmdFollowTrajectory_alt
+	TmSsAutonomous		rearranged the algorithms putting "lab test" stuff at end
+						changed from separate algorithms for going left vs going right to
+							algorithms that use new TmACmdFollowTrajectoryLeftOrRight
+	(refactored various ...Unclamped... cmds and cmd groups as Clamped and changed internal
+	 	behavior accordingly)
+	 TmACGrpTrajSwitchAndReleaseCube	created
+
+============= T744yr18_Orlando_2018-03-04_02-30_chgDsCntlsPerDrvrReq_fixTrajFilenms_dbg4TrajProbs.zip
+
+	(chgs made on hp computer in gym)
+	TmHdwrDsCntls			(buttons to lift grabber should NOT unclamp)
+							refactor names for buttons
+							swap functions of LB and RB for grabber up/down per driver request
+	TmSsGrabber				change commands assigned to LB/RB buttons
+	TmSsAutonomous			correct capitalization in trajectory filenames
+							and new alg (new alg is #6) that uses the new TmACmdFollowTrajectory_alt
+								command and runs the traj.csv file from bagnight (named traj_bagNight.csv)
+	TmACmdFollowTrajectory_alt	copied from TmACmdFollowTrajectory and changed to call different
+									methods for accessing encoders -- didn't help
+								changed to negate values fed to tankDriveRawVelocityFPS
+	(misc. - updated trajectory files on the robot -- not in eclipse)
+	
+	Notes: both this and bagnight code run backwards when following a trajectory. ProtoBotE code
+			runs forward.  Will do code comparison and figure out what changed.
+	
+============= T744yr18_Orlando_2018-03-03_21-45_addMoreTrajAlgsCamTrajFilesDocs.zip
+
+	TmSsAutonomous			add additional trajectory/auton algs per Sebastian
+	Tm744Opts				add options for camera installation info
+	TmSsCamera				created from 2017 code and stripped down to bare minimum
+	T744Robot2018			add camera subsystem to Kss
+	t744utils.fileIo.trajectories	updated/added new trajectory files 
+	update info in misc (DsAndRoControls, traj files, etc.)
+	
+============= T744yr18_Orlando_2018-03-03_18-50_newGrabberCntlsWorking_andArmClawMotors.zip
+
+	TmSsGrabber				add whenPressed() for new control buttons
+							improve tests for which xbox controller to use (still needs help)
+							put if(Opts....xtra controller) around refs to ALT_xxxx ds controls
+							add motion-and-wedge state machine to doPeriodic methods
+							add to initialization code (grabber up automatically in init methods)
+							other stuff??
+	TmSsArm					put if(Opts....xtra controller) around refs to ALT_xxxx ds controls
+	
+	Confirmed the following Main xbox controller functions:
+		LT - grabber motors release
+		LB - grabber down, no wedge, clamped
+		POV-N - grabber up with wedge, unclamped
+		RT - grabber motors grab
+		RB - grabber up, no wedge, unclamped
+		X - tower/arm claw grabbing
+		B - tower/arm claw releasing
+		POV-S -tower/arm claw motors off
+
+============= JmlSimYr18_Orlando_2018-03-03_14-55_fixExceptions_chgsPending_newCntlBdChart_do-not-use.zip
+
+	TmHdwrDsCntls			fix exceptions caused by incorrectly coded DsControlTypesE parms for some
+								of the new controls
+	
+============= JmlSimYr18_Orlando_2018-03-03_14-30_chgsPending_newCntlBdChart_do-not-use.zip
+
+	TmSsGrabber				more work on support for new DsControls
+	DriverStation_SimI		update names for DsControls being tested
+	misc.					cmds/cmdGroups created, removed
+
+============= T744yr18_Orlando_2018-03-03_00-05_errors_chgsPending_do-not-use.zip
+
+	TmHdwrDsCntls			add controls for functions requested by drive team
+	TmSsGrabber				PENDING: add support for new DsControls
+							support limit switch for wedge keyed off Tm744Opts.Opts parm
+	TmSsArm					add support for new DsControls
+	TmHdwrRoCntls			add limit switch for wedge
+	TmSdKeysI				add key for wedge limit switch
+	Tm744Opts				add option for wedge limit switch installed
+
+============= JmlSimYr18_Orlando_2018-03-02_17-55_maybeFixDeadXboxCntlrProb_fixConfusingCntlNames.zip
+
+	TmHdwrRoCntls			refactored names for grabber clamp assist controls to include piston position
+								to reduce confusion for those wiring the solenoids from our list of named
+								controls
+	TmSsArm					logArmInfo() now prints console message only if it is different than the previous
+								message.
+							runArm() prints console messages only if there's been a change from the previous
+								pair of messages (stg1 and stg2 status)
+							create addCmdToList() method to add a command to the teleop command list so can 
+								verify the list index
+	TmHdwrDsPhys			make m_instance final and simplify getInstance and constructor stuff
+							DsControlsMgr.getAnalog(), getPov(), getButton(), etc. now checks if there's a 
+								driver station attached	before starting to disable joystick or xbox controller
+							DsNamedControlsEntry.ButtonInfo constructor checks if there's a
+								driver station attached	before starting to disable joystick or xbox controller
+							(checking isDSAttached() should resolve the "dead xbox controller" issue)
+								
+	Note: need to change SD layout file to set type for "ArmStg2AllowedDir" to String instead of Number
+				(done in misc/sd2018_orlando_ver2-1b_2018-03-02_14-50.xml)
+
+============= T744yr18_Orlando_2018-03-02_00-30_fixCfgBugs_dbgDeadXboxCntlrProb.zip
+
+	TmHdwrRoCntls			swapped grabber clamp assist open/close solenoid assignments
+								(now sol2 opens, sol3 closes)
+								(there may be confusion here: to open the clamp assist,
+								 must retract the piston; to close it must extend the piston)
+							chg arm claw left motor RoMtrInversionE.NO_INVERT_MOTOR to INVERT
+							problem with "dead" xbox controller seems related to roboRIO not
+								having contact with driver station during boot (drv sta has to
+								wait for radio before can connect).  Reloading code or rebooting
+								the RIO from the driver station or restarting robot code from
+								the driver station all seem to correct the problem.	 
+
+============= JmlSimYr18_Orlando_2018-03-01_18-30_fakedCanTalonStartingToWork-needsEncSnsPhase.zip
+
+	TmFakeable_CanTalonSrx	work on making Fake mode functional
+								for things that affect the encoder, always call the 'fake' code;
+									the talon may be real, but if it doesn't have an encoder attached
+									we'll need to provide fake encoder data
+								clean up
+								refactor for clarity
+							implement battery compensation for PercentOut requests
+	TmHdwrRoCntls			set arm stage "has encoder" parm based on ARM_ENC option in Tm744Opts
+							set encoders for both arm stage motors to "matches motor"
+							cfg for both arm stage motors matches bag night; expect changes.
+							changes required by changes to TmFakeable_CanTalonSrx
+	TmHdwrRoPhysBase		add USE_FAKE_ENCODER to RoMtrHasEncoderE and make appropriate changes to
+								code that references the enum
+	Tm744Opts				add options for more things
+							add a method for the simulation code to call to set "simulation mode" option
+								(this option can be used in other code to configure things for simulation
+								mode when needed.)
+	TmSsDriveTrain			reset encoders from the various ...Init methods
+							don't use encoderPolarityFactor when calculating distance adjusted for polarity
+								the Talons handle it automatically as long as mtr.sensorPhase() is called before
+								mtr.setInverted()
+							call mtr.enableCurrentLimit() for all motors
+							changes required by changes to TmFakeable_CanTalonSrx							
+	TmSsArm					call mtr.enableCurrentLimit() for all motors
+							changes required by changes to TmFakeable_CanTalonSrx
+	TmSsGrabber             call mtr.enableCurrentLimit() for all motors
+							changes required by changes to TmFakeable_CanTalonSrx
+	TmToolsI				add new clampToRange() method
+									
+============= T744yr18_Orlando_2018-02-27_23-41_codeDriveEncoderIncrVsThingDirParm_betterGyroMsg_onRobot.zip
+
+	TmHdwrRoCntls			code the EncoderIncrVsThingDirE parm for the drive-train encoders
+	TmGyroADXRS453SPI		add more info to the "invalid data" message 
+
+============= T744yr18_Orlando_2018-02-27_23-08_deleteUnusedClass_reduceErrMsgsShownForGyro_onRobot.zip
+
+	TmSsDriveTrain			delete unused class DriveMotorEncoder
+	TmGyroADXRS453SPI		cut down the number of error messages from the gyro if it's found but is 
+								unhappy.  Show count-down counter for them in each message.
+
+============= JmlSimYr18_Orlando_2018-02-27_18-20_doNotAllowArmNudgingToMoveArmOutOfRange.zip
+	TmSsArm					have requestBothStagesServo() check for duplicate requests before changing servo parms
+							don't allow nudgeServoSetpoint() to set a setpoint outside the allowed range
+
+============= JmlSimYr18_Orlando_2018-02-27_17-45_maybeFixStg2JsBug_cleanup_updateCfgInfo_addConsoleMsgs.zip
+	TmHdwrRoCntls			switch stage2 settings back to MotorPosPercOutVsThingDirE.POS_MTR_PERCENT_OUT_MOVES_THING_UP
+							add SD keys to arm and grabber claw motors (motor percent out only)
+							change all MotorPosPercOutVsThingDirE.TBD to values based on 2/26/18 STF observations
+	TmHdwrRoPhysBase		refactor cSdKeyMtrSpeed to cSdKeyMtrPercentOut in RoNamedControlsEntry
+							include new parms in RoNamedControlsEntry.checkInitialValidity()
+	TmSsArm					get key for motor control mode and percent out from named control
+							add console msg to requestRunClawWithJoystick()
+							add console msg to display encoder snapshots at boot
+							nudgeServoSetpoint() only updates setpoint if new value is within allowed range
+	TmSsGrabber				get key for motor percent out from named control
+	TmHdwrDsCntls			document x-axis values in diagram of joystick
+	TmHdwrDsPhysBase		document x-axis values in diagram of joystick
+	TmSsDriveTrain			add console message if encoders don't reset to 0 in reset() method
+							call encoder reset() from sssDoRobotInit()
+
+============= T744yr18_OrlandoSTF_2018-02-26_23-30_addSdKeys_refactor_cleanup.zip
+
+	TmSdKeysI				add keys for arm allowed direction
+	TmSsArm					post allowed directions to SD
+							post to SD only from methods for that purpose
+	TmTCmdArmRunLiftWithXboxJoysticks		disable print messages via PrtYn.N
+	
+============= JmlSimYr18_Orlando_2018-02-26_19-10_cleanup_partialEnhance.zip
+	TmSsArm					set stage.motorDir from named control getEnt().cMtrVsThingDir
+							for arm lift, set motors' cMtrVsThingDir to match what was in TmSsArm
+	TmHdwrRoPhysBase		refactor RoDrvMtrDirVsRobotDirE to FrcAndJoysticksVsRoDrvMtrDirVsRobotDirE and 
+								refactor member names too
+							add EncoderIncrVsThingDirE enum and framework for coding it
+							reformat "showEverything"
+	TmHdwrRoCntls			code placeholder values for EncoderIncrVsThingDirE arg
+							reformat "showEverything"
+	
+			TBD: include new RoCntls parms in inspections
+
+============= JmlSimYr18_Orlando_2018-02-26_16-20_fixes_cleanup_partialEnhance.zip
+
+	TmHdwrDsCntls			eliminate DsNamedControlsE methods for getting buttons, etc. to maybe reduce overhead
+							use POV-North to put arm stage1/2 in Idle mode
+	TmCCmdArmLiftSetToIdleMode		created
+	T744Robot2018			use getEnt().getButton() method instead of enum method to get analog button
+	TmTCmdArmRunClawWithXboxJoystick	use getEnt().xxxx method instead of enum method to get joystick reading
+	TmTCmdDriveWithJoysticks			use getEnt().xxxx method instead of enum method to get joystick readings
+	TmSsArm					use getEnt().xxxx method instead of enum method to get joystick readings
+							add code to use button to set lift to idle mode
+							post info to SD from methods created for that purpose
+	TmSsGrabber				use getEnt().xxxx method instead of enum method to get button readings
+	TmHdwrDsPhys			fix bug getting analog button (was using wrong axis id)
+	TmHdwrDsPhysBase		refactor axis index parm and getter in analog button info enum
+	TmHdwrRoCntls			create MotorPercOutVsThingDirE and start framework for using it
+	(changes made in JmlSimYr18_Orlando)
+
+============= T744yr18_OrlandoSTF_2018-02-24_23-45_bugFixes_addFunction_armServoBuggy.zip
+
+	TmSsGrabber				TBD! - add state machine to manage lift and wedge interactions (time-dependent)
+							teleop: always clamped except while START pressed
+	TmHdwrDsCntls			add control for Start button used to unclamp grabber in teleop
+							refactor GRABBER_LIFT_AND_CLAMP to GRABBER_LIFT_AND_UNCLAMP
+	TmHdwrRoCntls			make all motors FAKEs for Software Test Fixture (STF) except drv front left (can 27)
+	TmSsArm					show physical limit switch settings (not encoder-based) in robotInit/disabledInit
+							do not set a default teleop cmd
+							add print msgs when changing arm claw state
+							in checkMotionBottom/TopLimitSwitch methods use <= and >= instead of < and >
+								to check encoder values
+	TmSdKeysE				add keys for physical limit switches for arm
+	TmCCmdArmClawStopMotors 	disable "initializing" message via PrtYn.N
+	TmCCmdArmClawStartGrabbing 	disable "initializing" message via PrtYn.N
+	TmCCmdArmClawStartReleasing disable "initializing" message via PrtYn.N
+	TmCCmdArmRunLiftWithEncoderPositions	disable console messages via PrtYn.N
+	TmHdwrDsPhys			change DsControlsMgr.getAnalog() to get axis number from connEnt instead of devEnt
+
+	(changes made in T744yr18_OrlandoSTF)
+	
+=========== T744yr18_OrlandoSTF_2018-02-24_05-30_fixBugs_armStg2SanerCfg_tweaks_cleanup.zip
+=========== T744yr18_Orlando_2018-02-24_05-30_fixBugs_armStg2SanerCfg_tweaks_cleanup.zip
+=========== JmlSimYr18_Orlando_2018-02-24_05-30_fixBugs_armStg2SanerCfg_tweaks_cleanup.zip
+	 TmSsDriveTrain			include sd key for gyro error count in args passed to TmGyroADXRS453SPI constructor
+							include gyro error count in things posted to SD
+	 TmGyroADXRS453SPI		include gyro error count in things that can be posted to SD
+	 TmSsArm				update stage1/2 target positions with corrected calcs (see spreadsheet in project 'misc' folder)
+							change stage2 from POS_PERCENT_OUT_MOVES_MECH_UP to POS_PERCENT_OUT_MOVES_MECH_DOWN per notes
+								from 2/18/18
+							"nudge with joystick" code now cubes the joystick reading instead of squaring...
+							refactor target positions from posEncoderxxxxx to encoderTargxxxxx
+							delete lots of commented-out code
+							we were using joystick control names to avoid checking limit switches for stage2 until it
+								had a sane encoder, etc.  Remove that limitation.  
+							add code to check encoders to all paths through "check limit switch" methods
+							add hysteresis to encoder settings for "limit switch" use so don't allow the "bad" direction
+								of motion too soon.
+							verify requested servo positions are in valid range, throw exception if not
+							claw grabbing code was using 'left' percent out for both motors (BUG!!). fixed so use left for
+								left motor and right for right motor.  Test in lab to see if they're now right or wrong.
+	 TmHdwrRoCntls			change both arm encoders from MATCHES_MOTOR to OPPOSITE_OF_MOTOR to reflect gym observations:
+								(stg1: pos PercOut moves up, and encoder values go negative)
+								(stg2: neg PercOut moves up, and encoder values go positive)
+	 TmSsGrabber			wedge defaults to ..... (oops!! there's no safe value!!!)
+							delete commented-out code that's now obsolete
+	 TmToolsI				change isInRange method(s) to detect when min > max and do the right thing automatically
+	 TmFakeable_RoDigitalInput	actually use the default setting passed to the FakeParms constructor (was hardcoding "false")
+	
+	(changes originally made in JmlSimYr18_Orlando project)
+	(also: JmlSimYr18_Orlando now processes btns for cmds properly)
+	
+============= T744yr18_Orlando_2018-02-22_23-17_sglSolGearShift_fixArmConsoleMsgs_fixGetAnalogForJoysticks.zip
+	Copied from T744yr18_BagNight_2018-02-20_23-59_FINAL_onBot.zip
+	TmSsArm					change Stage2 servo positions to have proper sign (should add positive
+								"distances" to the starting (bottom) value)
+							don't try to read things from Talons when not in appropriate operating mode
+								(chg in-line P.printfrmt to calls to new method)
+	T744Robot2018			switch to single-solenoid gear-shift
+	TmSsDrvGearShiftDblSol	change console message for clarity
+	TmSsDrvGearShift		change console message for clarity
+							uses only one solenoid, therefore remove (per Josh S.) the high-gear control
+							rewrite to use only one solenoid, to be fakeable, etc.
+	TmHdwrRoCntls			remove "HIGH gear" control
+	TmCCmdDriveShiftGear	switch from double solenoid for gear shift to single solenoid version
+	TmFakeable_Solenoid		check control and honor "USE_FAKE" requests
+	TmHdwrDsPhys			fix bug in getAnalog() (was using the connection for the control, not the device)
+	
+------------------ old history------------------	
+	
+============= T744yr18_BagNight_2018-02-20_23-30_onRobot_enableGyroInstrumentation.zip
+	TmSsDriveTrain			add gyro methods to subsystem's init and periodic code
+							add addition gyro sd info
+	TmSdKeysI				enable gyro Sd keys
+
+============= T744yr18_BagNight_2018-02-20_22-55_onRobot_initialStg2Tuning.zip
+	TmSsArm					set multiplierToMoveServoTargDown and multiplierToMoveServoTargUp for stage2
+							set top/bottom encoder readings for stage 2
+	
+
+============= T744yr18_BagNight_2018-02-20_22-30_onRobot_stg1sane_stg2needsTuning.zip
+	Copied from T744yr18_ProtoBotF with bad arm code
+	TmSsArm					NOTDONE [make resetEncoder() do nothing and make getEncoderReading() return the
+										raw encoder reading from motorObj.  (getEncoderReading() was always
+										returning 0 for reasons that remained undiagnosed.)]
+							resetEncoder() just updates encoderSnapshot
+							getEncoderReading returns raw reading - snapshot
+	TmHdwrRoCntls			make arm encoders ABSOLUTE_USED_AS_RELATIVE instead of UNKNOWN/RELATIVE
+	
+	
+	
+	History for T744yr18_ProtoBotF project
+============ T744yr18_ProtoBotF_2018-02-20_18-30_portMoreAutonFixes_snapshot.zip
+	(Port changes from hpPc ProtoBotE with additional autonomous changes per Alex D. et al)
+	TmACmdFollowTrajectory	change calcs for right/left error and what values get posted to SD
+							change calcs for right/left velocity and the values posted to SD
+	TmSsAutonomous			add algs for testing
+	TmSsDriveTrain			chg POS_P_GAIN
+	-----------------------------------------
+	(Port changes from hpPc ProtoBotE with additional autonomous changes per Alex D. and Sebastian)
+	TmACmdDriveStraight		increase timeout
+	TmSsDriveTrain			switch from explicit rear motor to encoder alias for reading encoders,
+								use getSelectedSensorPosition() instead of getQuadraturePosition(),
+								use setSelectedSensorPosition() instead of setQuadraturePosition()
+							add print statements
+							update constants POS_P_GAIN, P_GAIN, F_GAIN_LEFT/RIGHT, WHEEL_DIAMETER
+	TmSsDrvGearShift		default to HIGH gear in init methods
+	TmSsDrvGearShiftDblSol	default to HIGH gear in init methods	
+	-----------------------------------------
+	TmSsDriveTrain			chg if(false) to if(true) to restore function
+							make constants in DrvTrainCnst shadow their Cnst counterparts
+								to avoid problems when changes get made in one but not the other
+
+=========== T744yr18_ProtoBotF_2018-02-20_01-37_STF_portedChgsMadeSoFarForAutonTrajectoriesEtc.zip
+
+	(Port changes from hpPc ProtoBotE with partial autonomous changes per Alex D.)
+	TmACmdDriveStraight		created
+	TmACmdFollowTrajectory	bug fixes, debug statements
+	TmSsDriveTrain			tune config parms, add additional ones
+							comment out lines setting closed-loop ramp rate
+							move guts of work to "raw" drive methods, and make joystick
+								methods call them instead of the other way 'round
+							fix value for FPS_2_NuP100MS
+							use "if(false)" to ensure certain code wasn't overwriting what 
+								auton was trying to do (should probably change it to 'true'
+								to restore it)
+	TmSdKeysI				add new keys for TmSsDriveTrain autonomous debug, etc.
+	TmSsAutonomous			add alg to drive straight with no gyro
+							
+=========== T744yr18_ProtoBotF_2018-02-19_22-25_STF_fixesforPovBtns_armLmtSwInfoOnSd_maybeFixArmS1Enc.zip
+	created new src/t744opts package
+	t744opts/Tm744Opts	created to hold options that are unique to a roboRIO/computer/etc.
+							(e.g. "running on software test fixture" option). Since it resides
+							outside of the org folder it can be left unmodified (or modified
+							manually) when porting code from one project/computer to another
+	TmHdwrRoCntls		set RUN_STF from the option in Tm744Opts
+	TmSsArm				use ArmLiftMotorInfo.getEncoderReading() instead of reading encoder
+							directly from TalonSrx
+						call new method resetEncoder() from sssDoRobotInit and again if trip
+							actual bottom limit switch
+						if hit a limit switch and have to ignore requested motor percent out,
+							explicitly set the min percent out to hold position
+						if don't hit either limit switch, set allowed direction back to EITHER
+						add individual SD booleans for "limit switches": at top/at bottom
+	
+	Ported code from T744yr18_ProtoBotE_2018-02-19_16-15_driveEncodersNowOnFrontMotors.zip
